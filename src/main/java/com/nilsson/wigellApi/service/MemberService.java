@@ -1,7 +1,6 @@
 package com.nilsson.wigellApi.service;
 
 import com.nilsson.wigellApi.dto.*;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

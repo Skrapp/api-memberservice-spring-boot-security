@@ -4,7 +4,6 @@ import com.nilsson.wigellApi.dto.MemberDto;
 import com.nilsson.wigellApi.dto.MemberPatchDto;
 import com.nilsson.wigellApi.dto.MemberUpdateDto;
 import com.nilsson.wigellApi.dto.MemberWithAccountCreateDto;
-import com.nilsson.wigellApi.entity.Member;
 import com.nilsson.wigellApi.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

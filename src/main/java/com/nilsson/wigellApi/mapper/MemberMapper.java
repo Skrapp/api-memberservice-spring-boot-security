@@ -1,7 +1,6 @@
 package com.nilsson.wigellApi.mapper;
 
 import com.nilsson.wigellApi.dto.*;
-import com.nilsson.wigellApi.entity.Address;
 import com.nilsson.wigellApi.entity.Member;
 
 public final class MemberMapper {
