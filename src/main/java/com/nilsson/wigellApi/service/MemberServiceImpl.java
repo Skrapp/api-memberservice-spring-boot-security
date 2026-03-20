@@ -77,7 +77,9 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @memberServiceImpl.isOwner(#id)")
     public MemberDto update(Long id, MemberUpdateDto dto) {
-        //TODO checka så att användarnamn och födelsedatum inte används
+        //Checka så födelsedatum inte används
+        if(memberRepo.existsByDateOfBirth(dto.dateOfBirth()))
+            throw new IllegalArgumentException("Födelsedatum används redan.");
 
         Member member =  memberRepo.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException(id));
@@ -102,7 +104,9 @@ public class MemberServiceImpl implements MemberService{
     @Override
     @Transactional
     public MemberDto patch(Long id, MemberPatchDto dto) {
-        //TODO checka så att användarnamn och födelsedatum inte används
+        //Checka så födelsedatum inte används
+        if(memberRepo.existsByDateOfBirth(dto.dateOfBirth()))
+            throw new IllegalArgumentException("Födelsedatum används redan.");
 
         Member member =  memberRepo.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException(id));
@@ -131,7 +135,12 @@ public class MemberServiceImpl implements MemberService{
     @Override
     @Transactional
     public MemberDto create(MemberWithAccountCreateDto dto) {
-        //TODO checka så att användarnamn och födelsedatum inte används
+        //Checka så att användarnamn och födelsedatum inte används
+        if(memberRepo.existsByDateOfBirth(dto.dateOfBirth()))
+            throw new IllegalArgumentException("Födelsedatum används redan.");
+        if(appUserRepo.existsByUsername(dto.username()))
+            throw new IllegalArgumentException("Användarnamn används redan.");
+
         Member member = MemberMapper.fromCreate(dto);
 
         //se ifall address redan finns
