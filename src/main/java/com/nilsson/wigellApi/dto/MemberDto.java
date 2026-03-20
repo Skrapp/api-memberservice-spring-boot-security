@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public record MemberDto(
         Long id,
+        String username,
         String firstName,
         String lastName,
         AddressDto address,

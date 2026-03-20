@@ -17,13 +17,13 @@ public final class MemberMapper {
 
         return new MemberDto(
                 m.getId(),
+                m.getAppUser().getUsername(),
                 m.getFirstName(),
                 m.getLastName(),
                 addressDto,
                 m.getEmail(),
                 m.getPhoneNumber(),
                 m.getDateOfBirth()
-                //au.getUsername
         );
     }
 
@@ -59,4 +59,6 @@ public final class MemberMapper {
         if(dto.dateOfBirth()!= null)
             m.setDateOfBirth(dto.dateOfBirth());
     }
+
+    //UpdatePassword?
 }

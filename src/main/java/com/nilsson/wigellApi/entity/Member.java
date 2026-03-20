@@ -110,4 +110,12 @@ public class Member {
     public void setDateOfBirth(LocalDate birthDate) {
         this.dateOfBirth = birthDate;
     }
+
+    public AppUser getAppUser() {
+        return appUser;
+    }
+
+    public void setAppUser(AppUser appUser) {
+        this.appUser = appUser;
+    }
 }
