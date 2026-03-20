@@ -10,7 +10,6 @@ public final class MemberMapper {
         return new Member(dto.firstName(), dto.lastName(), dto.email(), dto.phoneNumber(), dto.dateOfBirth());
     }
 
-    //TODO lägg till AppUser
     public static MemberDto toDto(Member m){
         AddressDto addressDto = AddressMapper.toDto(m.getAddress());
 

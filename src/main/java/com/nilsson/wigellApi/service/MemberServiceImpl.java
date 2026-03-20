@@ -36,21 +36,6 @@ public class MemberServiceImpl implements MemberService{
         this.encoder = encoder;
     }
 
-    /*
-    Admin ska kunna utföra följande aktiviteter
-    *Lista medlemmar GET ”/admin/members” – All data på respektive medlem ska hämtas och visas
-    *Hämta enskild medlem GET ”/admin/members/{id}” – All data på vald medlem ska hämtas och visas
-    *Uppdatera uppgifter PUT ”/admin/members/{id}” – Samtlig data för vald medlem ska uppdateras
-    *Uppdatera uppgifter PATCH ”/admin/members/{id}” – Viss data för vald medlem ska uppdateras
-    *Lägga till medlem POST ”/admin/members” – Ny medlem ska läggas till i databasen
-    *Ta bort medlem DELETE ”/admin/members/{id}” – Angiven medlem ska raderas från databasen
-
-    Medlemmar ska kunna utföra följande aktiviteter
-    *Lista medlemmar GET ”/mypages/members” – firstName, lastName, addressCreateDto, email och phone på
-    samtliga medlemmar ska hämtas och visas
-    *Uppdatera uppgifter PUT ”/mypages/members/{id}” – Data för den inloggade medlemmen ska
-    uppdateras*/
-
     @Override
     @Transactional(readOnly = true)
     public List<MemberDto> listAll(){
@@ -70,7 +55,6 @@ public class MemberServiceImpl implements MemberService{
         Member member = memberRepo.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException(id));
         return MemberMapper.toDto(member);
-
     }
 
     @Override
@@ -85,6 +69,7 @@ public class MemberServiceImpl implements MemberService{
                 .orElseThrow(() -> new MemberNotFoundException(id));
         MemberMapper.applyUpdate(member, dto);
 
+        //se ifall address redan finns
         Address address = addressRepo
                 .findAddressByStreetAndPostalCodeAndCity(
                         dto.address().street(),
@@ -116,6 +101,7 @@ public class MemberServiceImpl implements MemberService{
             Address currentAddress = new Address(member.getAddress().getStreet(), member.getAddress().getPostalCode(), member.getAddress().getCity());
             AddressMapper.applyPatch(currentAddress, dto.address());
 
+            //se ifall address redan finns
             Address address = addressRepo.findAddressByStreetAndPostalCodeAndCity(
                             currentAddress.getStreet(),
                             currentAddress.getPostalCode(),
