@@ -8,20 +8,32 @@ import com.nilsson.wigellApi.exception.MemberNotFoundException;
 import com.nilsson.wigellApi.mapper.AddressMapper;
 import com.nilsson.wigellApi.mapper.MemberMapper;
 import com.nilsson.wigellApi.repository.AddressRepo;
+import com.nilsson.wigellApi.repository.AppUserRepo;
 import com.nilsson.wigellApi.repository.MemberRepo;
+import com.nilsson.wigellApi.security.AppUser;
+import com.nilsson.wigellApi.security.Role;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class MemberServiceImpl implements MemberService{
     private final MemberRepo memberRepo;
     private final AddressRepo addressRepo;
+    private final AppUserRepo appUserRepo;
+    private final PasswordEncoder encoder;
 
-    public MemberServiceImpl(MemberRepo memberRepo, AddressRepo addressRepo) {
+    public MemberServiceImpl(MemberRepo memberRepo, AddressRepo addressRepo, AppUserRepo appUserRepo, PasswordEncoder encoder) {
         this.memberRepo = memberRepo;
         this.addressRepo = addressRepo;
+        this.appUserRepo = appUserRepo;
+        this.encoder = encoder;
     }
 
     /*
@@ -53,18 +65,19 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @memberServiceImpl.isOwner(#id)")
     public MemberDto get(Long id) {
-        //TODO checka om man har behörighet
-        Member member =  memberRepo.findById(id)
+        Member member = memberRepo.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException(id));
         return MemberMapper.toDto(member);
+
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or @memberServiceImpl.isOwner(#id)")
     public MemberDto update(Long id, MemberUpdateDto dto) {
-        //TODO checka om man har behörighet
-        //TODO checka så att användarnamn och mail inte används
+        //TODO checka så att användarnamn och födelsedatum inte används
 
         Member member =  memberRepo.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException(id));
@@ -89,7 +102,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     @Transactional
     public MemberDto patch(Long id, MemberPatchDto dto) {
-        //TODO checka så att användarnamn och mail inte används
+        //TODO checka så att användarnamn och födelsedatum inte används
 
         Member member =  memberRepo.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException(id));
@@ -118,7 +131,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     @Transactional
     public MemberDto create(MemberWithAccountCreateDto dto) {
-        //TODO checka så att användarnamn och mail inte används
+        //TODO checka så att användarnamn och födelsedatum inte används
         Member member = MemberMapper.fromCreate(dto);
 
         //se ifall address redan finns
@@ -134,10 +147,19 @@ public class MemberServiceImpl implements MemberService{
                 );
         member.setAddress(address);
 
-        Member saved = memberRepo.save(member);
+        member = memberRepo.save(member);
 
-        //TODO spara användare
-        return MemberMapper.toDto(saved);
+        //Skapa användare
+        AppUser appUser = new AppUser(
+                dto.username(),
+                encoder.encode(dto.password()),
+                Set.of(Role.USER),
+                member
+        );
+        appUser = appUserRepo.save(appUser);
+        member.setAppUser(appUser);
+
+        return MemberMapper.toDto(member);
     }
 
     @Override
@@ -146,5 +168,19 @@ public class MemberServiceImpl implements MemberService{
         if(!memberRepo.existsById(id))
             throw new MemberNotFoundException(id);
         memberRepo.deleteById(id);
+    }
+
+    @Override
+    public boolean isOwner(Long id) {
+        //Se om inloggad användare äger medlem
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        AppUser owner = appUserRepo.findByMemberId(id)
+                .orElseThrow(() -> new AccessDeniedException("Medlem är ej kopplad till någon användare."));
+
+        if(!currentUser.equals(owner.getUsername())){
+            throw new AccessDeniedException("Du äger ej denna medlem.");
+        }
+        return true;
     }
 }

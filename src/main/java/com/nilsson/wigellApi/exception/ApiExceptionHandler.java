@@ -22,4 +22,9 @@ public class ApiExceptionHandler {
                 )
         );
     }
+
+    //TODO lägg till fler @ExceptionHandler
+    //AccessDeniedException
+    //UsernameNotFound
+    //Generell
 }

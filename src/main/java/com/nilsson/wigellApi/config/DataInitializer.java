@@ -33,7 +33,8 @@ public class DataInitializer {
                 Member member3 = new Member("Lotta", "Jonsson", address2,"lotta.j@mail.com","077-8880955", LocalDate.of(1963, 4, 16));
                 Member member4 = new Member("Robert", "Karlsson", address3,"karlssonr@mail.com","073-1212342", LocalDate.of(1999, 8, 28));
                 Member member5 = new Member("Hannes", "Jonsson", address4,"sennah@mail.com","070-005 4565", LocalDate.of(2001, 2, 12));
-                memberRepo.saveAll(List.of(member1, member2, member3, member4, member5));
+                Member member6 = new Member("Gustaf", "Yngsdotter", address4,"gurra@mail.com","070-005 5555", LocalDate.of(1996, 2, 12));
+                memberRepo.saveAll(List.of(member1, member2, member3, member4, member5, member6));
 
                 AppUser admin1 = new AppUser("staffan", passwordEncoder.encode("1234"), Set.of(Role.ADMIN), member1);
                 AppUser admin2 = new AppUser("majali", passwordEncoder.encode("1234"), Set.of(Role.ADMIN), member2);

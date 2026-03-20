@@ -15,9 +15,11 @@ public final class MemberMapper {
     public static MemberDto toDto(Member m){
         AddressDto addressDto = AddressMapper.toDto(m.getAddress());
 
+        String username = m.getAppUser() == null ? null : m.getAppUser().getUsername();
+
         return new MemberDto(
                 m.getId(),
-                m.getAppUser().getUsername(),
+                username,
                 m.getFirstName(),
                 m.getLastName(),
                 addressDto,

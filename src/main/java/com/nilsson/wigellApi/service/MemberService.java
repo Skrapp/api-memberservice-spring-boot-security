@@ -1,6 +1,7 @@
 package com.nilsson.wigellApi.service;
 
 import com.nilsson.wigellApi.dto.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -26,4 +27,5 @@ public interface MemberService {
     MemberDto patch(Long id, MemberPatchDto dto);
     MemberDto create(MemberWithAccountCreateDto dto);
     void delete(Long id);
+    boolean isOwner(Long id);
 }

@@ -12,6 +12,8 @@ public record MemberWithAccountCreateDto(
         @NotNull AddressCreateDto address,
         @NotBlank @Size(max = 100) String email,
         @Size(max = 20) String phoneNumber,
-        @NotNull LocalDate dateOfBirth
+        @NotNull LocalDate dateOfBirth,
+        @NotBlank @Size(min = 3, max = 50) String username,
+        @NotBlank @Size(min = 3, max = 60) String password
 ) {
 }
