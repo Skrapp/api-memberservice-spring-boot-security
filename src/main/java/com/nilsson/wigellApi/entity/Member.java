@@ -1,5 +1,6 @@
 package com.nilsson.wigellApi.entity;
 
+import com.nilsson.wigellApi.security.AppUser;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -30,6 +31,9 @@ public class Member {
     @Column(name = "birthDate", nullable = false, unique = true)
     private LocalDate dateOfBirth;
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    private AppUser appUser;
+
     protected Member() {
     }
 
@@ -50,6 +54,7 @@ public class Member {
         this.dateOfBirth = dateOfBirth;
     }
 
+    @SuppressWarnings("unused")
     public void setId(Long id) {
         this.id = id;
     }
