@@ -9,4 +9,6 @@ import java.time.LocalDate;
 @Repository
 public interface MemberRepo extends JpaRepository<Member,Long> {
     boolean existsByDateOfBirth(LocalDate dateOfBirth);
+
+    boolean existsByDateOfBirthAndIdNot(LocalDate dateOfBirth, Long id);
 }

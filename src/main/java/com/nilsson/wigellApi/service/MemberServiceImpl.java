@@ -61,8 +61,8 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @memberServiceImpl.isOwner(#id)")
     public MemberDto update(Long id, MemberUpdateDto dto) {
-        //Checka så födelsedatum inte används
-        if(memberRepo.existsByDateOfBirth(dto.dateOfBirth()))
+        //Checka så födelsedatum inte används av någon annan
+        if(memberRepo.existsByDateOfBirthAndIdNot(dto.dateOfBirth(),id))
             throw new IllegalArgumentException("Födelsedatum används redan.");
 
         Member member =  memberRepo.findById(id)
@@ -89,14 +89,13 @@ public class MemberServiceImpl implements MemberService{
     @Override
     @Transactional
     public MemberDto patch(Long id, MemberPatchDto dto) {
-        //Checka så födelsedatum inte används
-        if(memberRepo.existsByDateOfBirth(dto.dateOfBirth()))
+        //Checka så födelsedatum inte används av någon annan
+        if(dto.dateOfBirth() != null && memberRepo.existsByDateOfBirthAndIdNot(dto.dateOfBirth(),id))
             throw new IllegalArgumentException("Födelsedatum används redan.");
 
         Member member =  memberRepo.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException(id));
 
-        MemberMapper.applyPatch(member, dto);
         if(dto.address() != null) {
             Address currentAddress = new Address(member.getAddress().getStreet(), member.getAddress().getPostalCode(), member.getAddress().getCity());
             AddressMapper.applyPatch(currentAddress, dto.address());
@@ -114,8 +113,25 @@ public class MemberServiceImpl implements MemberService{
             member.setAddress(address);
         }
 
-        Member saved = memberRepo.save(member);
-        return MemberMapper.toDto(saved);
+        if(patchDtoContainsChangesToMember(dto)) {
+            MemberMapper.applyPatch(member, dto);
+            member = memberRepo.save(member);
+        }
+
+        return MemberMapper.toDto(member);
+    }
+
+    /**
+     * Om någon av fälten innehåller något så returnerar det sant
+     * @param dto
+     * @return true om dto innehåller förändringar
+     */
+    private boolean patchDtoContainsChangesToMember(MemberPatchDto dto){
+        return dto.firstName() != null
+                || dto.lastName() != null
+                || dto.email() != null
+                || dto.phoneNumber() != null
+                || dto.dateOfBirth() != null;
     }
 
     @Override
@@ -170,12 +186,8 @@ public class MemberServiceImpl implements MemberService{
         //Se om inloggad användare äger medlem
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        AppUser owner = appUserRepo.findByMemberId(id)
-                .orElseThrow(() -> new AccessDeniedException("Medlem är ej kopplad till någon användare."));
-
-        if(!currentUser.equals(owner.getUsername())){
-            throw new AccessDeniedException("Du äger ej denna medlem.");
-        }
-        return true;
+        return appUserRepo.findByMemberId(id)
+                .map(owner -> currentUser.equals(owner.getUsername()))
+                .orElse(false);
     }
 }
