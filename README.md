@@ -4,8 +4,9 @@ Uppgift under utbildningen Systemutveckling Java till kursen Backend. Uppgiften 
 som kan hantera medlemmar. Olika användare har olika behöright med hur medlemmar kan hanteras.
 
 Huvudsyftet med uppgiften är att träna på:
-- **Spring Boot** Bygga API
-- **Spring Boot Security** Använda Spring boot Security för säkerhet med och hantera roller med olika behörigheter
+- **REST API** Arbeta och förstå hur man skapar ett REST API
+- **Spring Boot** Använda Spring Boot för att bygga API
+- **Spring Boot Security** Använda Spring Boot Security för säkerhet och hantera roller med olika behörigheter
 
 ## ✅ Funktionalitet
 
